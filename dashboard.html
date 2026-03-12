@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MyMoney Pro | Ultimate Dashboard</title>
+    <meta name="theme-color" content="#0B0E14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        /* ========================================================================
+        1.0 CORE VARIABLES & THEME ENGINE
+        ========================================================================
+        */
+        :root {
+            /* --- BRAND PALETTE --- */
+            --primary: #7F56D9; /* Royal Purple */
+            --primary-glow: rgba(127, 86, 217, 0.4);
+            --primary-dim: rgba(127, 86, 217, 0.1);
+            
+            --accent: #2DD4BF; /* Teal Mint */
+            --accent-glow: rgba(45, 212, 191, 0.4);
+            
+            --gradient-main: linear-gradient(135deg, #7F56D9 0%, #9E77ED 100%);
+            --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+            
+            /* --- SEMANTIC COLORS --- */
+            --success: #12B76A;
+            --success-bg: rgba(18, 183, 106, 0.1);
+            --warning: #F79009;
+            --warning-bg: rgba(247, 144, 9, 0.1);
+            --danger: #F04438;
+            --danger-bg: rgba(240, 68, 56, 0.1);
+            --info: #0BA5EC;
+            
+            /* --- SURFACE COLORS (DARK MODE DEFAULT) --- */
+            --bg-body: #0B0E14; /* Deepest Void */
+            --bg-surface: #161B26; /* Panel Color */
+            --bg-glass: rgba(22, 27, 38, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            
+            /* --- TYPOGRAPHY --- */
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            
+            --text-100: #FFFFFF;
+            --text-200: #98A2B3;
+            --text-300: #667085;
+            
+            /* --- METRICS --- */
+            --header-height: 70px;
+            --nav-height: 85px; /* Taller for mobile touch targets */
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+            
+            /* --- ANIMATION --- */
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light Mode Override (Applied via JS) */
+        body.light-mode {
+            --bg-body: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --border: #EAECF0;
+            --text-100: #101828;
+            --text-200: #475467;
+            --text-300: #98A2B3;
+            --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%);
+        }
+
+        /* ========================================================================
+        2.0 RESET & GLOBAL LAYOUT
+        ========================================================================
+        */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            outline: none;
+        }
+
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+            overflow: hidden; /* App-like behavior, no scroll bounce on body */
+            background-color: var(--bg-body);
+            color: var(--text-100);
+            font-family: var(--font-main);
+        }
+
+        /* The App Shell */
+        #root {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            max-width: 600px; /* Tablet constraint */
+            margin: 0 auto;
+            background: var(--bg-body);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* ========================================================================
+        3.0 HEADER COMPONENT
+        ========================================================================
+        */
+        header {
+            flex-shrink: 0;
+            height: calc(var(--header-height) + var(--safe-top));
+            padding: var(--safe-top) 20px 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 50;
+        }
+
+        .user-profile {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: var(--gradient-main);
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 700; font-family: var(--font-display);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+        .greeting { display: flex; flex-direction: column; }
+        .greeting span { font-size: 11px; color: var(--text-200); text-transform: uppercase; letter-spacing: 0.5px; }
+        .greeting strong { font-size: 16px; font-family: var(--font-display); }
+
+        .header-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-100);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: transform 0.2s var(--ease-spring);
+        }
+        .icon-btn:active { transform: scale(0.9); background: var(--bg-body); }
+
+        /* ========================================================================
+        4.0 SCROLLABLE VIEWPORT
+        ========================================================================
+        */
+        main.viewport {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            /* CRITICAL: Padding bottom ensures content isn't hidden behind Nav/FAB */
+            padding: 20px 20px 120px 20px; 
+            position: relative;
+        }
+
+        /* View Switching Logic */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s var(--ease-smooth);
+        }
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========================================================================
+        5.0 CARDS & WIDGETS
+        ========================================================================
+        */
+        /* Summary Card */
+        .summary-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Background Glow */
+        .summary-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, var(--primary-dim) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .balance-label { font-size: 13px; color: var(--text-200); font-weight: 500; }
+        .balance-amount { font-size: 36px; font-weight: 800; font-family: var(--font-display); margin: 4px 0 16px 0; letter-spacing: -1px; }
+        
+        .cashflow-row { display: flex; gap: 12px; }
+        .cashflow-item {
+            flex: 1; background: rgba(255,255,255,0.03);
+            padding: 12px; border-radius: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .cf-icon {
+            width: 32px; height: 32px; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px;
+        }
+        .cf-icon.inc { background: var(--success-bg); color: var(--success); }
+        .cf-icon.exp { background: var(--danger-bg); color: var(--danger); }
+        .cf-info { display: flex; flex-direction: column; }
+        .cf-lbl { font-size: 10px; color: var(--text-200); font-weight: 600; text-transform: uppercase; }
+        .cf-val { font-size: 14px; font-weight: 700; }
+
+        /* Transaction List */
+        .list-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        .list-title { font-size: 18px; font-weight: 700; font-family: var(--font-display); }
+        .list-filter { font-size: 12px; color: var(--accent); font-weight: 600; cursor: pointer; }
+
+        .txn-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 16px; border-radius: 20px;
+            margin-bottom: 12px;
+            transition: transform 0.2s var(--ease-spring);
+        }
+        .txn-item:active { transform: scale(0.97); }
+
+        .txn-left { display: flex; align-items: center; gap: 16px; }
+        .txn-icon-box {
+            width: 48px; height: 48px; border-radius: 16px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 22px; color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .txn-meta { display: flex; flex-direction: column; }
+        .txn-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .txn-date { font-size: 12px; color: var(--text-200); display: flex; align-items: center; gap: 6px; }
+        .acc-tag { 
+            padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase;
+            background: rgba(255,255,255,0.1); 
+        }
+
+        .txn-right { text-align: right; }
+        .txn-val { font-size: 16px; font-weight: 700; display: block; margin-bottom: 4px; }
+        .txn-val.inc { color: var(--success); }
+        .txn-val.exp { color: var(--text-100); }
+        .txn-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .act-btn { font-size: 16px; color: var(--text-300); opacity: 0.5; }
+        
+        /* ========================================================================
+        6.0 NAVIGATION DOCK (THE FIX)
+        ========================================================================
+        */
+        .bottom-dock {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 560px; /* Constrain on tablet */
+            margin: 0 auto;
+            height: 70px;
+            background: rgba(22, 27, 38, 0.9); /* Dark Glass */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000; /* High Z-index to float above everything */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Light Mode Dock Override */
+        body.light-mode .bottom-dock {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .dock-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 60px; height: 100%;
+            color: var(--text-300);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            position: relative;
+        }
+
+        .dock-item span { font-size: 24px; transition: 0.3s; }
+        .dock-label { 
+            font-size: 10px; font-weight: 600; margin-top: 4px; 
+            opacity: 0; transform: translateY(10px); transition: 0.3s;
+            position: absolute; bottom: 8px;
+        }
+
+        /* Active State Animation */
+        .dock-item.active { color: var(--primary); }
+        .dock-item.active span { transform: translateY(-8px); }
+        .dock-item.active .dock-label { opacity: 1; transform: translateY(0); }
+        
+        /* Active Indicator Dot */
+        .dock-item.active::after {
+            content: ''; position: absolute; top: 12px;
+            width: 4px; height: 4px; background: var(--accent);
+            border-radius: 50%; box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* Floating Action Button (FAB) sits ABOVE the dock */
+        .fab {
+            position: absolute;
+            bottom: 45px; /* Offset to float nicely */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 64px; height: 64px;
+            border-radius: 20px;
+            background: var(--text-100); /* High contrast */
+            color: var(--bg-body);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 1001; /* Higher than dock */
+            cursor: pointer;
+            transition: transform 0.2s var(--ease-spring);
+            border: 4px solid var(--bg-body); /* Creates a "cutout" effect */
+        }
+        .fab:active { transform: translateX(-50%) scale(0.9); }
+
+        /* ========================================================================
+        7.0 CHARTS & SKELETONS
+        ========================================================================
+        */
+        .chart-box {
+            background: var(--bg-surface); padding: 20px;
+            border-radius: 24px; border: 1px solid var(--border);
+            margin-bottom: 20px; height: 250px; position: relative;
+        }
+        canvas { width: 100%; height: 100%; }
+
+        /* Skeleton Loading Animation */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-surface) 25%, rgba(255,255,255,0.05) 50%, var(--bg-surface) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer { 0% {background-position: 200% 0;} 100% {background-position: -200% 0;} }
+
+        /* ========================================================================
+        8.0 MODAL & CALCULATOR
+        ========================================================================
+        */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 2000; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex; align-items: flex-end;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal-sheet {
+            width: 100%; height: 92%;
+            background: var(--bg-surface);
+            border-top-left-radius: 32px; border-top-right-radius: 32px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            padding: 24px; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s var(--ease-spring);
+        }
+        .modal-overlay.open .modal-sheet { transform: translateY(0); }
+
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sheet-title { font-size: 20px; font-weight: 700; font-family: var(--font-display); }
+
+        .type-toggle {
+            display: flex; background: var(--bg-body); padding: 4px;
+            border-radius: 16px; margin-bottom: 24px;
+        }
+        .type-btn {
+            flex: 1; text-align: center; padding: 12px;
+            font-size: 13px; font-weight: 700; color: var(--text-200);
+            border-radius: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .type-btn.active { background: var(--bg-surface); color: var(--text-100); box-shadow: var(--shadow-sm); }
+
+        /* Calculator Specifics */
+        .calc-display {
+            background: var(--bg-body); border-radius: 24px;
+            padding: 24px; text-align: right; margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .calc-input-note {
+            width: 100%; background: transparent; border: none;
+            text-align: right; color: var(--text-200); font-size: 14px;
+            margin-bottom: 8px; font-family: var(--font-main);
+        }
+        .calc-input-amt {
+            font-size: 42px; font-weight: 800; color: var(--text-100);
+            font-family: var(--font-display); letter-spacing: -1px;
+        }
+
+        .numpad-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; flex: 1;
+        }
+        .key-btn {
+            background: rgba(255,255,255,0.03); border: none;
+            border-radius: 16px; font-size: 22px; font-weight: 600;
+            color: var(--text-100); cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: background 0.1s;
+        }
+        .key-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
+        .key-btn.primary { background: var(--primary); color: white; }
+
+        /* Account & Category Chips */
+        .chip-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .chip {
+            padding: 8px 16px; border-radius: 100px;
+            background: var(--bg-body); border: 1px solid var(--border);
+            color: var(--text-200); font-size: 12px; font-weight: 600;
+            white-space: nowrap; cursor: pointer; transition: 0.2s;
+        }
+        .chip.selected {
+            background: var(--text-100); color: var(--bg-body); border-color: var(--text-100);
+        }
+
+        /* Utils */
+        .hide { display: none !important; }
+        .bg-o { background: #FF9800; } .bg-b { background: #2962FF; } .bg-p { background: #7C4DFF; }
+        .bg-t { background: #00BFA5; } .bg-r { background: #FF1744; } .bg-g { background: #546E7A; } .bg-in { background: #00C853; }
+        
+    </style>
+</head>
+<body>
+
+    <div id="root">
+        
+        <header>
+            <div class="user-profile">
+                <div class="avatar" id="headerAvatar">JD</div>
+                <div class="greeting">
+                    <span>Good Morning</span>
+                    <strong id="headerName">User</strong>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="icon-btn" onclick="alert('Notifications')">
+                    <span class="material-icons-round">notifications</span>
+                </div>
+                <div class="icon-btn" style="color:var(--danger)" onclick="window.location.href='index.html'">
+                    <span class="material-icons-round">logout</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="viewport">
+            
+            <div id="tab-home" class="view-section active">
+                
+                <div class="summary-card">
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount" id="homeTotal">₹0.00</div>
+                    
+                    <div class="cashflow-row">
+                        <div class="cashflow-item">
+                            <div class="cf-icon inc"><span class="material-icons-round">arrow_downward</span></div>
+                            <div class="cf-info">
+                                <span class="cf-lbl">Income</span>
+                                <span class="cf-val" id="homeInc">0</span>
+                            </div>
+                        </div>
+                        <div class="cashflow-item">
+                            <div class="cf-icon exp"><span class="material-icons-round">arrow_upward</span></div>
+                            <div class="cf-info">
+                                <span class="cf-lbl">Expense</span>
+                                <span class="cf-val" id="homeExp">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-header">
+                    <span class="list-title">Transactions</span>
+                    <span class="list-filter">View All</span>
+                </div>
+
+                <div id="txnList">
+                    </div>
+                
+                <div id="emptyState" class="hide" style="text-align:center; padding:40px; color:var(--text-300);">
+                    <span class="material-icons-round" style="font-size:48px; opacity:0.3">savings</span>
+                    <p style="margin-top:10px">No transactions yet.</p>
+                </div>
+            </div>
+
+            <div id="tab-stats" class="view-section">
+                <h2 class="list-title" style="margin-bottom:20px;">Financial Stats</h2>
+                
+                <div class="chart-box">
+                    <canvas id="lineChart"></canvas>
+                </div>
+
+                <div class="list-title" style="font-size:16px; margin-bottom:15px;">Real Account Balances</div>
+                <div id="accountBreakdown">
+                    </div>
+            </div>
+
+            <div id="tab-analysis" class="view-section">
+                <h2 class="list-title" style="margin-bottom:20px;">Spending Analysis</h2>
+                
+                <div class="chart-box" style="height:300px; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+                    <canvas id="donutChart"></canvas>
+                    <div style="position:absolute; text-align:center; pointer-events:none;">
+                        <span style="font-size:12px; color:var(--text-300)">TOTAL</span><br>
+                        <strong style="font-size:20px;" id="donutTotal">0</strong>
+                    </div>
+                </div>
+
+                <div id="categoryList"></div>
+            </div>
+
+            <div id="tab-budgets" class="view-section">
+                <h2 class="list-title" style="margin-bottom:20px;">Monthly Budgets</h2>
+                <div id="budgetList"></div>
+            </div>
+
+        </main>
+
+        <div class="fab" onclick="Modal.open()">
+            <span class="material-icons-round">add</span>
+        </div>
+
+        <nav class="bottom-dock">
+            <div class="dock-item active" onclick="App.switchTab('home', this)">
+                <span class="material-icons-round">home</span>
+                <span class="dock-label">Home</span>
+            </div>
+            <div class="dock-item" onclick="App.switchTab('stats', this)">
+                <span class="material-icons-round">analytics</span>
+                <span class="dock-label">Stats</span>
+            </div>
+            <div style="width:60px;"></div> 
+            
+            <div class="dock-item" onclick="App.switchTab('analysis', this)">
+                <span class="material-icons-round">pie_chart</span>
+                <span class="dock-label">Analysis</span>
+            </div>
+            <div class="dock-item" onclick="window.location.href='settings.html'">
+                <span class="material-icons-round">settings</span>
+                <span class="dock-label">Settings</span>
+            </div>
+        </nav>
+
+        <div class="modal-overlay" id="addModal">
+            <div class="modal-sheet">
+                <div class="sheet-header">
+                    <span class="material-icons-round" onclick="Modal.close()" style="padding:10px; cursor:pointer">close</span>
+                    <span class="sheet-title">New Transaction</span>
+                    <span class="material-icons-round" style="color:var(--success)">check_circle</span>
+                </div>
+
+                <div class="type-toggle">
+                    <div class="type-btn active" id="btnExp" onclick="Modal.setType('expense')">EXPENSE</div>
+                    <div class="type-btn" id="btnInc" onclick="Modal.setType('income')">INCOME</div>
+                </div>
+
+                <div class="chip-scroll" id="accChips">
+                    <div class="chip selected" onclick="Modal.setAcc('Cash', this)">Cash</div>
+                    <div class="chip" onclick="Modal.setAcc('Bank', this)">Bank</div>
+                    <div class="chip" onclick="Modal.setAcc('Card', this)">Card</div>
+                </div>
+
+                <div class="chip-scroll" id="catChips">
+                    </div>
+
+                <div class="calc-display">
+                    <input type="text" id="inpNote" class="calc-input-note" placeholder="Add a note...">
+                    <div class="calc-input-amt" id="dispAmt">0</div>
+                </div>
+
+                <div class="numpad-grid">
+                    <button class="key-btn" onclick="Calc.add(7)">7</button>
+                    <button class="key-btn" onclick="Calc.add(8)">8</button>
+                    <button class="key-btn" onclick="Calc.add(9)">9</button>
+                    <button class="key-btn" style="font-size:12px; color:var(--text-300)">DATE</button>
+
+                    <button class="key-btn" onclick="Calc.add(4)">4</button>
+                    <button class="key-btn" onclick="Calc.add(5)">5</button>
+                    <button class="key-btn" onclick="Calc.add(6)">6</button>
+                    <button class="key-btn" style="color:var(--primary)">+</button>
+
+                    <button class="key-btn" onclick="Calc.add(1)">1</button>
+                    <button class="key-btn" onclick="Calc.add(2)">2</button>
+                    <button class="key-btn" onclick="Calc.add(3)">3</button>
+                    <button class="key-btn" style="color:var(--primary)">-</button>
+
+                    <button class="key-btn" onclick="Calc.add('.')">.</button>
+                    <button class="key-btn" onclick="Calc.add(0)">0</button>
+                    <button class="key-btn" onclick="Calc.del()">⌫</button>
+                    <button class="key-btn primary" onclick="Calc.save()">SAVE</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* --- 1. CONFIG & UTILS --- */
+        const CONFIG = {
+            cats: {
+                expense: [
+                    {name:'Food', icon:'restaurant', color:'bg-o'},
+                    {name:'Shop', icon:'shopping_bag', color:'bg-b'},
+                    {name:'Travel', icon:'directions_bus', color:'bg-t'},
+                    {name:'Health', icon:'favorite', color:'bg-r'},
+                    {name:'Bills', icon:'receipt', color:'bg-g'}
+                ],
+                income: [
+                    {name:'Salary', icon:'account_balance', color:'bg-in'},
+                    {name:'Invest', icon:'trending_up', color:'bg-b'}
+                ]
+            }
+        };
+
+        const Utils = {
+            formatCurrency(num) {
+                return '₹' + num.toLocaleString('en-IN');
+            },
+            vibrate() {
+                if(navigator.vibrate) navigator.vibrate(15);
+            }
+        };
+
+        /* --- 2. STATE MANAGER --- */
+        const Store = {
+            key: 'MyMoneyPro_V5',
+            data: { 
+                transactions: [], 
+                budgets: [
+                    {cat:'Food', limit:10000, color:'#FF9800'},
+                    {cat:'Shop', limit:5000, color:'#2962FF'}
+                ],
+                pref: { darkMode: true }
+            },
+            
+            init() {
+                const s = localStorage.getItem(this.key);
+                if(s) this.data = JSON.parse(s);
+                this.applyTheme();
+            },
+            
+            save() { 
+                localStorage.setItem(this.key, JSON.stringify(this.data)); 
+                App.render();
+            },
+            
+            addTxn(txn) { 
+                this.data.transactions.unshift(txn); 
+                this.save(); 
+            },
+            
+            delTxn(id) {
+                this.data.transactions = this.data.transactions.filter(t => t.id !== id);
+                this.save();
+            },
+
+            applyTheme() {
+                if(!this.data.pref.darkMode) document.body.classList.add('light-mode');
+            }
+        };
+
+        /* --- 3. CALCULATOR LOGIC --- */
+        const Calc = {
+            val: '0',
+            add(n) {
+                Utils.vibrate();
+                if(this.val === '0' && n !== '.') this.val = '';
+                this.val += n;
+                this.update();
+            },
+            del() {
+                Utils.vibrate();
+                this.val = this.val.slice(0, -1);
+                if(this.val === '') this.val = '0';
+                this.update();
+            },
+            update() { document.getElementById('dispAmt').innerText = this.val; },
+            save() {
+                const amt = parseFloat(this.val);
+                if(!amt || amt <= 0) return alert("Enter amount");
+                
+                Store.addTxn({
+                    id: Date.now(),
+                    date: new Date().toISOString(),
+                    type: Modal.type,
+                    amt: amt,
+                    note: document.getElementById('inpNote').value || Modal.cat.name,
+                    cat: Modal.cat.name,
+                    icon: Modal.cat.icon,
+                    color: Modal.cat.color,
+                    account: Modal.acc
+                });
+                
+                Modal.close();
+            }
+        };
+
+        /* --- 4. MODAL CONTROLLER --- */
+        const Modal = {
+            el: document.getElementById('addModal'),
+            type: 'expense',
+            cat: null,
+            acc: 'Cash',
+
+            open() {
+                this.el.classList.add('open');
+                Calc.val = '0'; Calc.update();
+                this.setType('expense');
+            },
+            close() { this.el.classList.remove('open'); },
+            setType(t) {
+                this.type = t;
+                document.getElementById('btnExp').className = t==='expense' ? 'type-btn active' : 'type-btn';
+                document.getElementById('btnInc').className = t==='income' ? 'type-btn active' : 'type-btn';
+                this.renderCats();
+            },
+            setAcc(acc, el) {
+                this.acc = acc;
+                document.querySelectorAll('#accChips .chip').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+            },
+            renderCats() {
+                const con = document.getElementById('catChips');
+                con.innerHTML = '';
+                const list = CONFIG.cats[this.type];
+                this.cat = list[0]; // Default
+
+                list.forEach((c, i) => {
+                    const el = document.createElement('div');
+                    el.className = i===0 ? 'chip selected' : 'chip';
+                    el.innerText = c.name;
+                    el.onclick = () => {
+                        document.querySelectorAll('#catChips .chip').forEach(x => x.classList.remove('selected'));
+                        el.classList.add('selected');
+                        this.cat = c;
+                    };
+                    con.appendChild(el);
+                });
+            }
+        };
+
+        /* --- 5. MAIN APP CONTROLLER --- */
+        const App = {
+            init() {
+                Store.init();
+                // Set User Name
+                const auth = JSON.parse(localStorage.getItem('MyMoneyPro_V5_Auth'));
+                if(auth) {
+                    document.getElementById('headerName').innerText = auth.name;
+                    document.getElementById('headerAvatar').innerText = auth.name.charAt(0);
+                }
+                this.render();
+            },
+
+            switchTab(id, el) {
+                Utils.vibrate();
+                document.querySelectorAll('.view-section').forEach(x => x.classList.remove('active'));
+                document.getElementById('tab-'+id).classList.add('active');
+                
+                document.querySelectorAll('.dock-item').forEach(x => x.classList.remove('active'));
+                el.classList.add('active');
+
+                if(id === 'stats') this.renderStats();
+                if(id === 'analysis') this.renderAnalysis();
+                if(id === 'budgets') this.renderBudgets();
+            },
+
+            render() {
+                const txns = Store.data.transactions;
+                let inc=0, exp=0;
+                
+                // 1. Calculate Totals
+                txns.forEach(t => t.type==='income' ? inc+=t.amt : exp+=t.amt);
+                
+                document.getElementById('homeTotal').innerText = Utils.formatCurrency(inc - exp);
+                document.getElementById('homeInc').innerText = Utils.formatCurrency(inc);
+                document.getElementById('homeExp').innerText = Utils.formatCurrency(exp);
+
+                // 2. Render List
+                const con = document.getElementById('txnList');
+                con.innerHTML = '';
+                if(txns.length === 0) {
+                    document.getElementById('emptyState').classList.remove('hide');
+                } else {
+                    document.getElementById('emptyState').classList.add('hide');
+                    txns.slice(0, 20).forEach(t => { // Show last 20
+                        const date = new Date(t.date).toLocaleDateString();
+                        const isExp = t.type === 'expense';
+                        
+                        const el = document.createElement('div');
+                        el.className = 'txn-item';
+                        el.innerHTML = `
+                            <div class="txn-left">
+                                <div class="txn-icon-box ${t.color}">
+                                    <span class="material-icons-round">${t.icon}</span>
+                                </div>
+                                <div class="txn-meta">
+                                    <span class="txn-name">${t.note}</span>
+                                    <div class="txn-date">
+                                        <span class="acc-tag">${t.account}</span>
+                                        ${date}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="txn-right">
+                                <span class="txn-val ${isExp ? 'exp' : 'inc'}">
+                                    ${isExp ? '-' : '+'} ${Utils.formatCurrency(t.amt)}
+                                </span>
+                                <span class="material-icons-round act-btn" onclick="App.del(${t.id})">delete</span>
+                            </div>
+                        `;
+                        con.appendChild(el);
+                    });
+                }
+            },
+
+            del(id) { if(confirm('Delete?')) Store.delTxn(id); },
+
+            /* --- REAL ACCOUNT BREAKDOWN --- */
+            renderStats() {
+                const accs = {'Cash':0, 'Bank':0, 'Card':0};
+                Store.data.transactions.forEach(t => {
+                    const acc = t.account || 'Cash';
+                    t.type==='income' ? accs[acc]+=t.amt : accs[acc]-=t.amt;
+                });
+
+                const con = document.getElementById('accountBreakdown');
+                con.innerHTML = '';
+                
+                Object.entries(accs).forEach(([k, v]) => {
+                    con.innerHTML += `
+                        <div class="txn-item">
+                            <div class="txn-left">
+                                <div class="txn-icon-box bg-b"><span class="material-icons-round">account_balance</span></div>
+                                <div class="txn-meta">
+                                    <span class="txn-name">${k} Balance</span>
+                                </div>
+                            </div>
+                            <div class="txn-val">${Utils.formatCurrency(v)}</div>
+                        </div>
+                    `;
+                });
+                
+                // Draw Line Chart (Simulated)
+                Chart.line('lineChart');
+            },
+
+            renderAnalysis() {
+                // ... (Similar logic to previous, using canvas)
+                const txns = Store.data.transactions;
+                const exps = txns.filter(t => t.type==='expense');
+                const cats = {};
+                let total = 0;
+                exps.forEach(t => { cats[t.cat] = (cats[t.cat]||0) + t.amt; total+=t.amt; });
+                
+                document.getElementById('donutTotal').innerText = Utils.formatCurrency(total);
+                Chart.donut('donutChart', cats, total);
+                
+                // List
+                const con = document.getElementById('categoryList');
+                con.innerHTML = '';
+                Object.entries(cats).forEach(([k, v]) => {
+                    const pct = Math.round((v/total)*100);
+                    con.innerHTML += `
+                        <div class="txn-item">
+                            <div class="txn-left">
+                                <div class="txn-meta"><span class="txn-name">${k}</span></div>
+                            </div>
+                            <div class="txn-right">
+                                <span class="txn-val">${pct}%</span>
+                                <span style="font-size:12px">${Utils.formatCurrency(v)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            renderBudgets() {
+                const con = document.getElementById('budgetList');
+                con.innerHTML = '';
+                // Simple budget logic reused
+                Store.data.budgets.forEach(b => {
+                    // Logic to sum expense for category would go here
+                    con.innerHTML += `<div class="summary-card"><div class="balance-label">${b.cat} Budget</div><div class="cf-val">${Utils.formatCurrency(b.limit)}</div></div>`;
+                });
+            }
+        };
+
+        /* --- 6. CHART ENGINE --- */
+        const Chart = {
+            line(id) {
+                const ctx = document.getElementById(id).getContext('2d');
+                ctx.clearRect(0,0,300,150);
+                // Draw a nice curve
+                ctx.beginPath();
+                ctx.moveTo(0, 100);
+                ctx.bezierCurveTo(50, 100, 50, 50, 100, 50);
+                ctx.bezierCurveTo(150, 50, 150, 120, 200, 120);
+                ctx.bezierCurveTo(250, 120, 250, 20, 300, 20);
+                ctx.strokeStyle = '#7F56D9';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+            },
+            donut(id, data, total) {
+                const ctx = document.getElementById(id).getContext('2d');
+                const w = ctx.canvas.width;
+                const h = ctx.canvas.height;
+                ctx.clearRect(0,0,w,h);
+                
+                let start = 0;
+                const colors = ['#F04438', '#F79009', '#2DD4BF', '#7F56D9'];
+                let i = 0;
+                
+                if(total === 0) {
+                    ctx.beginPath(); ctx.arc(w/2, h/2, 100, 0, 6.28); ctx.strokeStyle='#333'; ctx.lineWidth=20; ctx.stroke(); return;
+                }
+
+                Object.values(data).forEach(v => {
+                    const slice = (v/total) * 2 * Math.PI;
+                    ctx.beginPath();
+                    ctx.arc(w/2, h/2, 100, start, start+slice);
+                    ctx.strokeStyle = colors[i%colors.length];
+                    ctx.lineWidth = 25;
+                    ctx.stroke();
+                    start += slice; i++;
+                });
+            }
+        };
+
+        window.onload = () => App.init();
+    </script>
+</body>
+</html>
